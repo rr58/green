@@ -1,39 +1,71 @@
 package tuntiprojekti.model.dao;
 
-import java.io.IOException;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.sql.Connection;
+import java.sql.DriverManager;
+//import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+//import java.sql.SQLException;
+import java.sql.Statement;
 
-/**
- * Servlet implementation class DataAccessObject
- */
-@WebServlet("/DataAccessObject")
-public class DataAccessObject extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public DataAccessObject() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
+public class DataAccessObject {
 
 	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 * Antaa tietokantayhteyden
+	 * 
+	 * @return connTietokantayhteys
 	 */
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+	protected static Connection getConnection() {
+		Connection connection = null;
+
+		// Alkum‰‰ritykset
+		String username = "";
+		String password = "";
+		String url = "";         //"jdbc:mysql://proto468.haaga-helia.fi:3306/projekti"
+		
+		
+		try {
+			// Ladataan ajuri
+			Class.forName("org.mariadb.jdbc.Driver").newInstance();
+		
+		// Avataan yhteys conn-nimiseen muuttujaan
+			connection = DriverManager.getConnection(url, username, password);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		return connection;
+	}
+	
+
+	/**
+	 * Sulkee Statementin ja Connectionin
+	 * 
+	 * @param SQL-statement
+	 * @param Tietokantayhteys
+	 */
+	protected static void close(Statement stmt, Connection connection) {
+		close (null, stmt, connection);
 	}
 
 	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 * Sulkee ResultSetin, Statementin ja Connectionin
+	
 	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
+	protected static void close(ResultSet rs, Statement stmt, Connection conn ) {
+		
+		try {
+			if (rs != null) { // Suljetaan rs (palautetut taulut), mik‰li olemassa
+				rs.close();
+			}
+			if (stmt != null) { // Suljetaan stmt (SQL-statement), mik‰li olemassa
+				stmt.close();
+			}
+			if (conn != null) { // Suljetaan conn (yhteys), mik‰li olemassa
+				conn.close();
+			}
+			
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
-
+	
 }
