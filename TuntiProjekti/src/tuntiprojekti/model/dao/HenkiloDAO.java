@@ -1,5 +1,10 @@
 package tuntiprojekti.model.dao;
 
+import java.sql.Statement;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -18,7 +23,53 @@ import tuntiprojekti.model.Henkilo;
  *
  */
 
-public class HenkiloDAO extends DataAccessObject {
+public class HenkiloDAO {
+	
+	/**
+	 * Konstruktori
+	 * lataa tietokantayhteyden ajurin
+	 */
+	public HenkiloDAO() throws DAOPoikkeus {
+		
+		try {
+			Class.forName(DBConnectionProperties.getInstance().getProperty("driver")).newInstance();
+		} catch(Exception e) {
+			throw new DAOPoikkeus("Tietokannan ajuria ei kyetty lataamaan.", e);
+		}
+		
+	}
+	
+	/**
+	 * Avaa tietokantayhteyden
+	 * @return avatun tietokantayhteyden
+	 * @throws Exception Mikäli yhteyden avaaminen ei onnistu
+	 */
+	private Connection avaaYhteys() throws DAOPoikkeus {
+		
+		try {
+			return DriverManager.getConnection(
+					DBConnectionProperties.getInstance().getProperty("url"),
+					DBConnectionProperties.getInstance().getProperty("username"),
+					DBConnectionProperties.getInstance().getProperty("password"));
+		} catch (Exception e) {
+			throw new DAOPoikkeus("Tietokantayhteyden avaaminen epäonnistui", e);
+		}
+		
+	}
+	
+	/**
+	 * Sulkee tietokantayhteyden
+	 * @param yhteys Suljettava yhteys
+	 */
+	private void suljeYhteys(Connection yhteys) throws DAOPoikkeus {
+		try {
+			if (yhteys != null && !yhteys.isClosed()) {
+				yhteys.close();
+			}
+		} catch (Exception e) {
+			throw new DAOPoikkeus("Tietokantayhteys ei jostain syystä suostu menemään kiinni.", e);
+		}
+	}
 
 	/**
 	 * Lisää Henkilo
@@ -27,10 +78,29 @@ public class HenkiloDAO extends DataAccessObject {
 	 * 			
 	 * @throws SQLException
 	 */
-	public void addHenkilo(Henkilo henk) throws SQLException {
-
-
-
+	public void addHenkilo(Henkilo h) throws DAOPoikkeus {
+		
+		//avataan yhteys
+		Connection yhteys = avaaYhteys();
+		
+		try {
+			//alustetaan sql-lause
+			String sql = "INSERT INTO henkilo(etunimi, sukunimi, username, password) "
+					+ "VALUES(?, ?, ?, ?)";
+			PreparedStatement lause = yhteys.prepareStatement(sql);
+			//täytetään puuttuvat tiedot
+			lause.setString(1, h.getEtunimi());
+			lause.setString(2, h.getSukunimi());
+			lause.setString(3, h.getUsername());
+			lause.setString(4, h.getPassword());
+			
+		} catch (Exception e) {
+			throw new DAOPoikkeus("Henkilön lisäämisyritys aiheutti virheen", e);
+		} finally {
+			suljeYhteys(yhteys);
+		}
+		
+		
 	}
 	/**
 	 * päivitä Henkilo
@@ -39,9 +109,31 @@ public class HenkiloDAO extends DataAccessObject {
 	 * 			
 	 * @throws SQLException
 	 */
-	public void updateHenkilo(Henkilo henk) throws SQLException {
+	public void updateHenkilo(Henkilo h) throws DAOPoikkeus {
 
-
+		Connection yhteys = avaaYhteys();
+		
+		try {
+			//alustetaan sql-lause
+			String sql = "UPDATE henkilo SET "
+						+ "etunimi = ?, "
+						+ "sukunimi = ?, "
+						+ "username = ?, "
+						+ "password = ? "
+						+ "WHERE henk_id = ?;";
+			PreparedStatement lause = yhteys.prepareStatement(sql);
+			//täytetään puuttuvat tiedot
+			lause.setString(1, h.getEtunimi());
+			lause.setString(2, h.getSukunimi());
+			lause.setString(3, h.getUsername());
+			lause.setString(4, h.getPassword());
+			lause.setInt(5, h.getHenk_id());
+			
+		} catch (Exception e) {
+			throw new DAOPoikkeus("Henkilön lisäämisyritys aiheutti virheen", e);
+		} finally {
+			suljeYhteys(yhteys);
+		}
 
 	}
 	/**
@@ -51,9 +143,28 @@ public class HenkiloDAO extends DataAccessObject {
 	 * 			
 	 * @throws SQLException
 	 */
-	public void removeHenkilo(Henkilo henk) throws SQLException {
+	public void removeHenkilo(Henkilo h) throws DAOPoikkeus {
 
-
+		Connection yhteys = avaaYhteys();
+		
+		try {
+			
+			//alustetaan sql-lause
+			String sql = "DELETE FROM henkilo WHERE id=?;";
+			PreparedStatement lause = yhteys.prepareStatement(sql);
+			
+			//täytetään puuttuvat tiedot
+			lause.setInt(1, h.getHenk_id());
+			
+			//suoritetaan lause
+			lause.executeUpdate();
+			System.out.println("POISTETTIIN HENKILÖ TIETOKANNASTA: ");
+			
+		} catch(Exception e) {
+			throw new DAOPoikkeus("Henkilön poistamissyritys aiheutti virheen", e);
+		} finally {
+			suljeYhteys(yhteys);
+		}
 
 	}
 	/**
@@ -73,9 +184,32 @@ public class HenkiloDAO extends DataAccessObject {
 	 * 
 	 * @return ArrayList<Henkilo> Lista Henkilöitä
 	 */
-	public ArrayList<Henkilo> findAll() {
+	public ArrayList<Henkilo> findAll() throws DAOPoikkeus {
 		
 		ArrayList<Henkilo> henkilot = new ArrayList<Henkilo>();
+		Henkilo henkilo = null;
+		
+		Connection yhteys = avaaYhteys();
+		
+		try {
+			
+			//suoritetaan haku
+			String sql="SELECT id, etunimi, sukunimi, username, password FROM henkilo";
+			Statement haku = yhteys.createStatement();
+			ResultSet tulokset = haku.executeQuery(sql);
+			
+			//käydään hakutulokset läpi
+			while(tulokset.next()) {
+				henkilo = readHenkilo(tulokset);
+				
+				henkilot.add(henkilo);
+			}
+		
+		} catch (Exception e) {
+			throw new DAOPoikkeus("Tietokantahaku aiheutti virheen", e);
+		}finally {
+			suljeYhteys(yhteys);		
+		}
 		
 		return henkilot;
 	}
