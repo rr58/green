@@ -1,12 +1,12 @@
 package tuntiprojekti.model.dao;
 
 import java.sql.Statement;
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 
 import tuntiprojekti.model.Henkilo;
@@ -85,14 +85,14 @@ public class HenkiloDAO {
 		
 		try {
 			//alustetaan sql-lause
-			String sql = "INSERT INTO henkilo(etunimi, sukunimi, username, password) "
+			String sql = "INSERT INTO henkilo(hlo_etunimi, hlo_sukunimi, hlo_tunnit, hlo_pvm) "
 					+ "VALUES(?, ?, ?, ?)";
 			PreparedStatement lause = yhteys.prepareStatement(sql);
 			//t‰ytet‰‰n puuttuvat tiedot
-			lause.setString(1, h.getEtunimi());
-			lause.setString(2, h.getSukunimi());
-			lause.setString(3, h.getUsername());
-			lause.setString(4, h.getPassword());
+			lause.setString(1, h.getHlo_etunimi());
+			lause.setString(2, h.getHlo_sukunimi());
+			lause.setInt(3, h.getHlo_tunnit());
+			lause.setTimestamp(4, h.getHlo_pvm());
 			
 		} catch (Exception e) {
 			throw new DAOPoikkeus("Henkilˆn lis‰‰misyritys aiheutti virheen", e);
@@ -116,18 +116,18 @@ public class HenkiloDAO {
 		try {
 			//alustetaan sql-lause
 			String sql = "UPDATE henkilo SET "
-						+ "etunimi = ?, "
-						+ "sukunimi = ?, "
-						+ "username = ?, "
-						+ "password = ? "
-						+ "WHERE henk_id = ?;";
+						+ "hlo_etunimi = ?, "
+						+ "hlo_sukunimi = ?, "
+						+ "hlo_tunnit = ?, "
+						+ "hlo_pvm = ? "
+						+ "WHERE hlo_id = ?;";
 			PreparedStatement lause = yhteys.prepareStatement(sql);
 			//t‰ytet‰‰n puuttuvat tiedot
-			lause.setString(1, h.getEtunimi());
-			lause.setString(2, h.getSukunimi());
-			lause.setString(3, h.getUsername());
-			lause.setString(4, h.getPassword());
-			lause.setInt(5, h.getHenk_id());
+			lause.setString(1, h.getHlo_etunimi());
+			lause.setString(2, h.getHlo_sukunimi());
+			lause.setInt(3, h.getHlo_tunnit());
+			lause.setTimestamp(4, h.getHlo_pvm());
+			lause.setInt(5, h.getHlo_id());
 			
 		} catch (Exception e) {
 			throw new DAOPoikkeus("Henkilˆn lis‰‰misyritys aiheutti virheen", e);
@@ -150,11 +150,11 @@ public class HenkiloDAO {
 		try {
 			
 			//alustetaan sql-lause
-			String sql = "DELETE FROM henkilo WHERE id=?;";
+			String sql = "DELETE FROM henkilo WHERE hlo_id=?;";
 			PreparedStatement lause = yhteys.prepareStatement(sql);
 			
 			//t‰ytet‰‰n puuttuvat tiedot
-			lause.setInt(1, h.getHenk_id());
+			lause.setInt(1, h.getHlo_id());
 			
 			//suoritetaan lause
 			lause.executeUpdate();
@@ -194,7 +194,7 @@ public class HenkiloDAO {
 		try {
 			
 			//suoritetaan haku
-			String sql="SELECT id, etunimi, sukunimi, username, password FROM henkilo";
+			String sql="SELECT id, hlo_etunimi, hlo_sukunimi, hlo_tunnit, hlo_pvm FROM henkilo";
 			Statement haku = yhteys.createStatement();
 			ResultSet tulokset = haku.executeQuery(sql);
 			
@@ -224,14 +224,14 @@ public class HenkiloDAO {
 		
 		try {
 			// Haetaan yhden Henkilon tiedot kyselyn tulostaulun (ResultSet-tyyppinen rs-olion) aktiiviselta tietorivilt‰
-			int henk_id = rs.getInt("henk_id");
-			String etunimi = rs.getString("etunimi");
-			String sukunimi = rs.getString("sukunimi");
-			String username = rs.getString("username");
-			String password = rs.getString("password");
+			int hlo_id = rs.getInt("hlo_id");
+			String hlo_etunimi = rs.getString("hlo_etunimi");
+			String hlo_sukunimi = rs.getString("hlo_sukunimi");
+			int hlo_tunnit = rs.getInt("hlo_tunnit");
+			Timestamp hlo_pvm = rs.getTimestamp("hlo_pvm");
 			
 			//  Luodaan ja palautetaan uusi Henkilo
-			return new Henkilo(henk_id, etunimi, sukunimi, username, password);
+			return new Henkilo(hlo_id, hlo_etunimi, hlo_sukunimi, hlo_tunnit, hlo_pvm);
 			
 		} catch (SQLException e) {
 			throw new RuntimeException(e);

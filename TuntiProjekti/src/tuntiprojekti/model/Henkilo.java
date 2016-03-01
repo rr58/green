@@ -1,65 +1,68 @@
 package tuntiprojekti.model;
 
+import java.sql.Timestamp;
+
 public class Henkilo {
 	
 	//attribuutit
-	private int henk_id;
-	private String etunimi;
-	private String sukunimi;
-	private String username;
-	private String password;
+	private int hlo_id;
+	private String hlo_etunimi;
+	private String hlo_sukunimi;
+	private int hlo_tunnit;
+	private Timestamp hlo_pvm;
+	
 	
 	public Henkilo() {
-		this.henk_id = 0;;
-		this.etunimi = null;
-		this.sukunimi = null;
-		this.username = null;
-		this.password = null;
+		this.hlo_id = 0;;
+		this.hlo_etunimi = null;
+		this.hlo_sukunimi = null;
+		this.hlo_tunnit = 0;
+		this.hlo_pvm = null;
 	}
-	public Henkilo(int henk_id, String etunimi, String sukunimi,
-			String username, String password) {
-		this.henk_id = henk_id;
-		this.etunimi = etunimi;
-		this.sukunimi = sukunimi;
-		this.username = username;
-		this.password = password;
+	public Henkilo(int hlo_id, String hlo_etunimi, String hlo_sukunimi,
+			int hlo_tunnit, Timestamp hlo_pvm) {
+		this.hlo_id = hlo_id;
+		this.hlo_etunimi = hlo_etunimi;
+		this.hlo_sukunimi = hlo_sukunimi;
+		this.hlo_tunnit = hlo_tunnit;
+		this.hlo_pvm = hlo_pvm;
+		
 	}
-	public int getHenk_id() {
-		return henk_id;
+	public int getHlo_id() {
+		return hlo_id;
 	}
-	public void setHenk_id(int henk_id) {
-		this.henk_id = henk_id;
+	public void setHlo_id(int hlo_id) {
+		this.hlo_id = hlo_id;
 	}
-	public String getEtunimi() {
-		return etunimi;
+	public String getHlo_etunimi() {
+		return hlo_etunimi;
 	}
-	public void setEtunimi(String etunimi) {
-		this.etunimi = etunimi;
+	public void setHlo_etunimi(String hlo_etunimi) {
+		this.hlo_etunimi = hlo_etunimi;
 	}
-	public String getSukunimi() {
-		return sukunimi;
+	public String getHlo_sukunimi() {
+		return hlo_sukunimi;
 	}
-	public void setSukunimi(String sukunimi) {
-		this.sukunimi = sukunimi;
+	public void setHlo_sukunimi(String hlo_sukunimi) {
+		this.hlo_sukunimi = hlo_sukunimi;
 	}
-	public String getUsername() {
-		return username;
+	public int getHlo_tunnit() {
+		return hlo_tunnit;
 	}
-	public void setUsername(String username) {
-		this.username = username;
+	public void setHlo_tunnit(int hlo_tunnit) {
+		this.hlo_tunnit = hlo_tunnit;
 	}
-	public String getPassword() {
-		return password;
+	public Timestamp getHlo_pvm() {
+		return hlo_pvm;
 	}
-	public void setPassword(String password) {
-		this.password = password;
+	public void setHlo_pvm(Timestamp hlo_pvm) {
+		this.hlo_pvm = hlo_pvm;
 	}
-	
 	@Override
 	public String toString() {
-		return "Henkilo [henk_id=" + henk_id + ", etunimi=" + etunimi
-				+ ", sukunimi=" + sukunimi + ", username=" + username
-				+ ", password=" + password + "]";
+		return "Henkilo [hlo_id=" + hlo_id + ", hlo_etunimi=" + hlo_etunimi
+				+ ", hlo_sukunimi=" + hlo_sukunimi + ", hlo_tunnit="
+				+ hlo_tunnit + ", hlo_pvm=" + hlo_pvm + "]";
 	}
 	
 	

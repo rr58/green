@@ -18,9 +18,9 @@ public class DataAccessObject {
 		Connection connection = null;
 
 		// Alkum‰‰ritykset
-		String username = "";
-		String password = "";
-		String url = "";         //"jdbc:mysql://proto468.haaga-helia.fi:3306/projekti"
+		String username = "a1404309";
+		String password = "xoBUcz24m";
+		String url = "jdbc:mariadb://localhost:3306/1404309";         //"jdbc:mysql://proto284.haaga-helia.fi:3306/a1404309"
 		
 		
 		try {
